@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<link>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audio Recorder Test</title>
+  <script src="https://cdn.jsdelivr.net/npm/@picocss/pico@1.5.10/css/postcss.config.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1.5.10/css/pico.min.css">
+  <link rel="shortcut icon" href="microphone.svg" type="image/svg+html">
+  <style>
+    button[aria-busy] {
+      pointer-events: all;
+      cursor: pointer;
+    }
+    audio + button {
+      width: max-content;
+      margin-left: auto;
+      float: right;
+    }
+    article {
+      margin: 1rem 0;
+      padding: 2rem 3rem;
+    }
+  </style>
+</head>
+<body>
+
+  <main class="container">
+    <header>
+      <h3>
+        Audio Recorder
+      </h3>
+      <hr>
+    </header>
+
+    <section>
+      <p>Audio recorder JavaScript demo.</p>
+    </section>
+
+    <section>
+      <button id="recordBtn">
+        <img src="microphone.svg">
+        Init Record
+      </button>
+    </section>
+  </main>
+
+  <script src="main.js"></script>
+</body>
+</html>
