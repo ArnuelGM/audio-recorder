@@ -3,14 +3,15 @@ const { ref } = Vue
 export function useRecorder() {
 
   let recordChunks = [];
-  let recording = ref(false);
+  const recording = ref(false);
   let mediaRecorder;
-  let record = ref(null)
-  let recordType = ref('audio')
+  const record = ref(null)
+  const recordType = ref('audio')
+  const mimeType = ref('')
 
   const processRecord = async () => {
     const recordData = new Blob(recordChunks, {
-      type: "video/webm;codecs=vp8,opus",
+      type: mimeType.value,
     });
     recordChunks = [];
     record.value = recordData
@@ -30,6 +31,7 @@ export function useRecorder() {
 
   const saveBuffer = (chunk) => {
     recordChunks.push(chunk);
+    mimeType.value = chunk.type
   };
 
   const recordStream = (stream) => {
