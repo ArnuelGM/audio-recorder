@@ -5,13 +5,23 @@ export default {
     <article>
       <h4>{{date.toLocaleString()}}</h4>
       
+      <video v-if="record.type === 'video'" :src="record.src" controls style="width: 100%; margin-bottom: 1rem;"></video>
       <div style="clear: both; overflow: hidden;">
         <button
           class="outline"
           style="float: left; margin-bottom: 1rem;"
           @click="playing ? pause() : play()"
+          v-if="record.type === 'audio'"
         >
-          {{ playing ? 'Pause' : 'Play' }}
+          <svg v-if="playing" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="white" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+            <path d="M9 4h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h2a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2z" stroke-width="0" fill="currentColor"></path>
+            <path d="M17 4h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h2a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2z" stroke-width="0" fill="currentColor"></path>
+          </svg>
+          <svg v-else xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="white" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+            <path d="M6 4v16a1 1 0 0 0 1.524 .852l13 -8a1 1 0 0 0 0 -1.704l-13 -8a1 1 0 0 0 -1.524 .852z" stroke-width="0" fill="currentColor"></path>
+          </svg>
         </button>
         <button
           @click="deleteRecord"
@@ -21,8 +31,6 @@ export default {
           Delete
         </button>
       </div>
-
-      <input type="range" :min="0" :max="record.audio.duration" :value="currentTime">
     </article>
   `,
 
@@ -35,21 +43,17 @@ export default {
     const { record } = props
     const { audio, date, id } = record
     const playing = ref(false)
-    const currentTime = ref(0)
 
-    audio.addEventListener('ended', () => playing.value = false)
-    audio.addEventListener('timeupdate', () => {
-      currentTime.value = audio.currentTime
-    })
+    if(record.type === 'audio') audio.addEventListener('ended', () => playing.value = false)
 
     const play = () => {
-      record.audio.play()
+      audio.play()
       console.dir(record.audio)
       playing.value = true
     }
 
     const pause = () => {
-      record.audio.pause()
+      audio.pause()
       playing.value = false
     }
 
@@ -61,7 +65,6 @@ export default {
       pause,
       deleteRecord,
       playing,
-      currentTime
     }
   }
 }

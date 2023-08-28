@@ -1,3 +1,4 @@
+const { ref } = Vue
 import { useRecorder } from "../composables/useRecorder.js";
 
 export default {
@@ -11,6 +12,10 @@ export default {
               : 'Init Record' 
         }}
       </button>
+      <label>
+        <input type="checkbox" v-model="video" name="capture_screen"></input>
+        Screen Capture
+      </label>
     </section>
   `,
   
@@ -19,20 +24,25 @@ export default {
 
   setup(props, { emit }) {
     
-    let { initRecord, stopRecording, recording } = useRecorder()
+    let video = ref(false)
+    let { initRecord, stopRecording, recording, recordType } = useRecorder()
 
-    const toggleRecord = () => recording.value ? getRecord(): initRecord();
+    const toggleRecord = () => recording.value ? getRecord(): initRecord({video: video.value});
     
     const getRecord = async () => {
       const record = await stopRecording()
   
-      const audioSrc = URL.createObjectURL(record)
-      const audio = new Audio(audioSrc)
+      const src = URL.createObjectURL(record)
+
+      let audio = null;
+      if(recordType.value === 'audio') audio = new Audio(src)
   
       const data = {
         id: crypto.randomUUID().toString(),
         audio,
-        audioSrc,
+        record,
+        type: recordType.value,
+        src,
         date: new Date()
       }
       emit('record', data)
@@ -40,7 +50,8 @@ export default {
 
     return {
       toggleRecord,
-      recording
+      recording,
+      video
     }
   }
 }

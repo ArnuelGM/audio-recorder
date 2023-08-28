@@ -2,19 +2,19 @@ const { ref } = Vue
 
 export function useRecorder() {
 
-  let audioChunks = [];
+  let recordChunks = [];
   let recording = ref(false);
   let mediaRecorder;
   let record = ref(null)
+  let recordType = ref('audio')
 
   const processRecord = async () => {
-    const audioData = new Blob(audioChunks, {
-      type: "audio/webm;codecs=opus",
+    const recordData = new Blob(recordChunks, {
+      type: "video/webm;codecs=vp8,opus",
     });
-    audioChunks = [];
-    record.value = audioData
-    console.log({audioData})
-    return audioData
+    recordChunks = [];
+    record.value = recordData
+    return recordData
   };
 
   const stopRecording = async () => {
@@ -28,28 +28,37 @@ export function useRecorder() {
     })
   };
 
-  const saveAudioBuffer = (chunk) => {
-    console.log({chunk})
-    audioChunks.push(chunk);
+  const saveBuffer = (chunk) => {
+    recordChunks.push(chunk);
   };
 
   const recordStream = (stream) => {
     mediaRecorder = new MediaRecorder(stream);
     //mediaRecorder.onstop = processRecord;
-    mediaRecorder.ondataavailable = (event) => saveAudioBuffer(event.data);
+    mediaRecorder.ondataavailable = (event) => saveBuffer(event.data);
     mediaRecorder.start(10000); // Guardamos el buffer cada 10 segundos
     recording.value = true;
   };
 
   const requestRecord = async (options) => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          /* noiseSuppression: true, */
-          /* echoCancellation: true, */
+
+      recordType.value = !!options?.video ? 'video' : 'audio'
+
+      let stream;
+
+      if(recordType.value === 'video') {
+        stream = await navigator.mediaDevices.getDisplayMedia({
+          audio: true,
           ...options
-        },
-      });
+        });
+      }
+      else {
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+          ...options
+        });
+      }
 
       recordStream(stream);
     } catch (error) {
@@ -66,6 +75,7 @@ export function useRecorder() {
     initRecord,
     stopRecording,
     recording,
-    record
+    record,
+    recordType
   }
 }

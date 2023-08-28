@@ -40,7 +40,7 @@
 
     <section>
       <record
-        v-for="rec in records.reverse()" 
+        v-for="rec in records" 
         :key="rec.id" 
         :record="rec"
         @delete-record="deleteRecord($event)"

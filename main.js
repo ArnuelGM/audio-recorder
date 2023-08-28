@@ -12,7 +12,7 @@ createApp({
     const records = ref([]);
 
     const addRecord = (record) => {
-      records.value.push(record)
+      records.value.unshift(record)
     };
 
     const deleteRecord = (recordID) => records.value = records.value.filter((rec) => rec.id !== recordID)
