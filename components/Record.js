@@ -6,6 +6,7 @@ export default {
       <h4>{{date.toLocaleString()}}</h4>
       
       <video v-if="record.type === 'video'" :src="record.src" controls style="width: 100%; margin-bottom: 1rem;"></video>
+      <p v-if="text">{{ text }}</p>
       <div style="clear: both; overflow: hidden;">
         <button
           class="outline"
@@ -41,7 +42,7 @@ export default {
   setup(props, { emit }) {
 
     const { record } = props
-    const { audio, date, id } = record
+    const { audio, date, id, text } = record
     const playing = ref(false)
 
     if(record.type === 'audio') audio.addEventListener('ended', () => playing.value = false)
