@@ -37,6 +37,8 @@
     </section>
 
     <recorder 
+      @init-speaking="captureSpeech($event)"
+      @speech="onSpeech($event)"
       @record="addRecord($event)">
     </recorder>
 

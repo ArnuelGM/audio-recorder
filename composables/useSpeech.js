@@ -13,11 +13,25 @@ export function useSpeech() {
 
   const stopListen = () => {
     if(!listening.value) return
-    rec.value.stop()
-    return new Promise((resolve, reject) => setTimeout(() => {
+    return new Promise((resolve, reject) => {
       listening.value = false
-      resolve(text.value)
-    }, 1000))
+      rec.value.onresult = (event) => {
+        onResult(event)
+        resolve(text.value)
+      }
+      rec.value.stop()
+    })
+  }
+
+  // http://localhost:5500/
+
+  const onResult = (event) => {
+    words.value = []
+    for(let i = 0; i < event.results.length; i++) {
+      let transcript = event.results[i][0].transcript
+      words.value.push(transcript)
+    }
+    text.value = words.value.join('')
   }
 
   const listen = async () => {
@@ -33,14 +47,10 @@ export function useSpeech() {
     rec.value.lang = 'es-CO'
     rec.value.continuous = true
     rec.value.interim = true
-    rec.value.addEventListener('result', (event) => {
-      words.value = []
-      for(let i = 0; i < event.results.length; i++) {
-        let transcript = event.results[i][0].transcript
-        words.value.push(transcript)
-      }
-      text.value = words.value.join('')
-    })
+    /* rec.value.addEventListener('result', (event) => {
+      onResult(event)
+    }) */
+    rec.value.onresult = onResult
     text.value = ''
     words.value = []
     rec.value.start()

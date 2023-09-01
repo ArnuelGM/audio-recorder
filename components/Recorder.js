@@ -1,4 +1,4 @@
-const { ref } = Vue
+const { ref, watch } = Vue
 import { useRecorder } from "../composables/useRecorder.js";
 import { useSpeech } from "../composables/useSpeech.js";
 
@@ -36,27 +36,41 @@ export default {
   `,
   
   // Events
-  emits: ['record', 'speech'],
+  emits: ['record', 'speech', 'initSpeaking', 'stopSpeaking'],
 
   setup(props, { emit }) {
     
     let video = ref(false)
+    const dataSpeeching = ref({})
     let { initRecord, stopRecording, recording, recordType } = useRecorder()
-    let { initListen, stopListen, listening } = useSpeech()
+    let { initListen, stopListen, listening, text } = useSpeech()
+
+    watch(() => text.value, (newValue) => {
+      emit('speech', newValue)
+    })
 
     const toggleListen = () => {
-      listening.value ? getSpeechToText() : initListen()
+      if(listening.value) {
+        getSpeechToText() 
+      }
+      else {
+        initListen()
+        dataSpeeching.value = {
+          type: 'text',
+          text: '',
+          id: '',
+          date: new Date(),
+        }
+        emit('initSpeaking', dataSpeeching.value)
+      }
     }
     const toggleRecord = () => recording.value ? getRecord(): initRecord({video: video.value});
     
     const getSpeechToText = async () => {
       const text = await stopListen()
-      emit('record', {
-        text,
-        id: crypto.randomUUID().toString(),
-        date: new Date(),
-        type: 'text'
-      })
+      dataSpeeching.value.text = text
+      dataSpeeching.value.id = crypto.randomUUID().toString()
+      emit('record', dataSpeeching.value)
     }
 
     const getRecord = async () => {
@@ -84,7 +98,8 @@ export default {
       video,
 
       toggleListen,
-      listening
+      listening,
+      text
     }
   }
 }
