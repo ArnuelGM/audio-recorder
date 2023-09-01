@@ -49,7 +49,6 @@ export default {
 
     const play = () => {
       audio.play()
-      console.dir(record.audio)
       playing.value = true
     }
 
@@ -66,6 +65,7 @@ export default {
       pause,
       deleteRecord,
       playing,
+      text
     }
   }
 }

@@ -54,7 +54,8 @@ export default {
       emit('record', {
         text,
         id: crypto.randomUUID().toString(),
-        date: new Date()
+        date: new Date(),
+        type: 'text'
       })
     }
 
