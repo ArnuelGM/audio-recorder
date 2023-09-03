@@ -2,28 +2,14 @@ const { ref } = Vue
 export function useSpeech() {
 
   const listening = ref(false)
-  const rec = ref(null);
-  const words = ref([]);
+  const rec = ref(null)
+  const words = ref([])
   const text = ref('')
   
   const initListen = (options = {}) => {
     if(listening.value) return
     listen()
   }
-
-  const stopListen = () => {
-    if(!listening.value) return
-    return new Promise((resolve, reject) => {
-      listening.value = false
-      rec.value.onresult = (event) => {
-        onResult(event)
-        resolve(text.value)
-      }
-      rec.value.stop()
-    })
-  }
-
-  // http://localhost:5500/
 
   const onResult = (event) => {
     words.value = []
@@ -34,27 +20,39 @@ export function useSpeech() {
     text.value = words.value.join('')
   }
 
+  const stopListen = () => {
+    if(!listening.value) return
+    return new Promise((resolve) => {
+      rec.value.stop()
+      listening.value = false
+      rec.value.removeEventListener('result', onResult)
+      resolve()
+    })
+  }
+
   const listen = async () => {
+    let rec = getSpeechRecorgnition()
+    if(!rec) return
+    rec.value.addEventListener('result', onResult)
+    text.value = ''
+    words.value = []
+    rec.value.start()
+    listening.value = true
+  }
+
+  const getSpeechRecorgnition = () => {
 
     window.SpeechRecognition = window.webkitSpeechRecognition || window.mozSpeechRecognition || window.SpeechRecognition
 
     if(! window.SpeechRecognition ) {
       alert('Error:\nYour browser does not supports web speech recognition API.')
-      return
+      return null
     }
-
     rec.value = new SpeechRecognition()
     rec.value.lang = 'es-CO'
     rec.value.continuous = true
-    rec.value.interim = true
-    /* rec.value.addEventListener('result', (event) => {
-      onResult(event)
-    }) */
-    rec.value.onresult = onResult
-    text.value = ''
-    words.value = []
-    rec.value.start()
-    listening.value = true
+    rec.value.interim = false
+    return rec
   }
 
   return {

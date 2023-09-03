@@ -6,7 +6,7 @@ export default {
   template: /* html */ `
     <section>
       <div style="display: flex; justify-content: space-between;">
-        <button @click="toggleRecord">
+        <button @click="toggleRecord" :disabled="listening">
           <img src="microphone.svg" v-if="!recording">
           {{
               recording
@@ -14,7 +14,7 @@ export default {
                 : 'Init Record'
           }}
         </button>
-        <button @click="toggleListen">
+        <button @click="toggleListen" :disabled="recording">
           <svg v-if="!listening" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
             <path d="M18 8a3 3 0 0 1 0 6"></path>
@@ -29,7 +29,7 @@ export default {
         </button>
       </div>
       <label>
-        <input type="checkbox" v-model="video" name="capture_screen"></input>
+        <input type="checkbox" v-model="video" name="capture_screen">
         Screen Capture
       </label>
     </section>
@@ -40,10 +40,10 @@ export default {
 
   setup(props, { emit }) {
     
-    let video = ref(false)
+    const video = ref(false)
     const dataSpeeching = ref({})
-    let { initRecord, stopRecording, recording, recordType } = useRecorder()
-    let { initListen, stopListen, listening, text } = useSpeech()
+    const { initRecord, stopRecording, recording, recordType } = useRecorder()
+    const { initListen, stopListen, listening, text } = useSpeech()
 
     watch(() => text.value, (newValue) => {
       emit('speech', newValue)
@@ -64,12 +64,12 @@ export default {
         emit('initSpeaking', dataSpeeching.value)
       }
     }
+
     const toggleRecord = () => recording.value ? getRecord(): initRecord({video: video.value});
     
     const getSpeechToText = async () => {
-      const text = await stopListen()
-      dataSpeeching.value.text = text
-      dataSpeeching.value.id = crypto.randomUUID().toString()
+      await stopListen()
+      dataSpeeching.value.id = crypto.randomUUID()
       emit('record', dataSpeeching.value)
     }
 

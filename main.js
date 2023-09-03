@@ -26,19 +26,17 @@ createApp({
     const deleteRecord = (recordID) => records.value = records.value.filter((rec) => rec.id !== recordID)
 
     const onSpeech = (text) => {
-      console.log({text})
-      //speecRecord.value.text = text
       let r = records.value[0]
-      r.text = `${text}...`
+      r.text = text
       r.id = text
       records.value[0] = r
     }
 
-    const captureSpeech = (speecRecord) => {
-      console.log('Capturing speech recognition...')
+    const captureSpeech = (speechRecord) => {
+      if(!speechRecord.text) speechRecord.text = '...'
+      addRecord(speechRecord)
       capturingSpeech.value = true
-      speecRecord.text = 'Listening...'
-      records.value.unshift(speecRecord)
+      //records.value.unshift(speecRecord)
     }
 
     return {
